@@ -1,0 +1,38 @@
+{
+  "name": "pref",
+  "version": "0.0.1",
+  "description": "Add preferences to your app or electron app",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "lint": "xo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/npezza93/pref.git"
+  },
+  "author": "Nick Pezza",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/npezza93/pref/issues"
+  },
+  "xo": {
+    "space": true,
+    "semicolon": false
+  },
+  "homepage": "https://github.com/npezza93/pref#readme",
+  "devDependencies": {
+    "electron": "^3.0.0",
+    "xo": "^0.23.0"
+  },
+  "engines": {
+    "node": ">=10"
+  },
+  "dependencies": {
+    "dot-prop": "^4.2.0",
+    "env-paths": "^1.0.0",
+    "make-dir": "^1.3.0",
+    "pkg-up": "^2.0.0",
+    "write-file-atomic": "^2.3.0"
+  }
+}
