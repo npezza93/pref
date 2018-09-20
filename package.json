@@ -4,7 +4,7 @@
   "description": "Add preferences to your app or electron app",
   "main": "index.js",
   "scripts": {
-    "test": "test",
+    "test": "./node_modules/.bin/mocha --exit",
     "lint": "xo"
   },
   "repository": {
@@ -22,7 +22,10 @@
   },
   "homepage": "https://github.com/npezza93/pref#readme",
   "devDependencies": {
+    "chai": "^4.1.2",
     "electron": "^3.0.0",
+    "mocha": "^5.2.0",
+    "tempy": "^0.2.1",
     "xo": "^0.23.0"
   },
   "engines": {
