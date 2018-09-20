@@ -30,10 +30,11 @@ class Pref {
       throw new Error('Project name could not be inferred. Please specify the `projectName` option.')
     }
 
-    options = {configName: 'config', fileExtension: 'json', ...options}
-
-    if (!options.cwd) {
-      options.cwd = envPaths(options.projectName).config
+    options = {
+      configName: 'config',
+      fileExtension: 'json',
+      cwd: this.findCwd(options),
+      ...options
     }
 
     this.events = new Emitter()
@@ -181,7 +182,19 @@ class Pref {
     }
   }
 
+  findCwd(options) {
+    const defaultElectronCwd = app && app.getPath('userData')
+    let cwd
 
+    if (options.cwd && !path.isAbsolute(options.cwd) && defaultElectronCwd) {
+      cwd = path.join(defaultElectronCwd, options.cwd)
+    } else if (!options.cwd && defaultElectronCwd) {
+      cwd = defaultElectronCwd
+    } else if (!options.cwd) {
+      cwd = envPaths(options.projectName).config
+    }
+
+    return cwd
   }
 
   openInEditor() {
