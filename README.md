@@ -53,14 +53,16 @@ Default: `config`
 
 Name of the config file (without extension).
 
-Useful if you need multiple config files for your app or module. For example, different config files between two major versions.
+Useful if you need multiple config files for your app or module. For example,
+different config files between two major versions.
 
 #### projectName
 
 Type: `string`<br>
 Default: The `name` field in the package.json closest to where `pref` is imported.
 
-You only need to specify this if you don't have a package.json file in your project.
+You only need to specify this if you don't have a package.json file in your
+project.
 
 #### cwd
 
@@ -71,7 +73,8 @@ Default: System default [user config directory](https://github.com/sindresorhus/
 
 Overrides `projectName`.
 
-The only use-case I can think of is having the config located in the app directory or on some external storage.
+The only use-case I can think of is having the config located in the app
+directory or on some external storage.
 
 #### fileExtension
 
@@ -80,7 +83,10 @@ Default: `json`
 
 Extension of the config file.
 
-You would usually not need this, but could be useful if you want to interact with a file with a custom file extension that can be associated with your app. These might be simple save/export/preference files that are intended to be shareable or saved outside of the app.
+You would usually not need this, but could be useful if you want to interact
+with a file with a custom file extension that can be associated with your app.
+These might be simple save/export/preference files that are intended to be
+shareable or saved outside of the app.
 
 ### Instance
 
@@ -118,7 +124,9 @@ Delete all items.
 
 `callback`: `(newValue, oldValue) => {}`
 
-Watches the given `key`, calling `callback` on any changes. When a key is first set `oldValue` will be `undefined`, and when a key is deleted `newValue` will be `undefined`.
+Watches the given `key`, calling `callback` on any changes. When a key is first
+set `oldValue` will be `undefined`, and when a key is deleted `newValue` will be
+`undefined`.
 
 #### .size
 
