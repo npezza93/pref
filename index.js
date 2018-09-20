@@ -170,11 +170,9 @@ class Pref {
   }
 
   disposable(onChange) {
-    return {
-      dispose() {
-        return this.events.removeListener('change', onChange)
-      }
-    }
+    const action = () => this.events.removeListener('change', onChange)
+
+    return new Disposable(action)
   }
 
   openInEditor() {
@@ -186,6 +184,23 @@ class Pref {
 
     for (const entry of Object.entries(store)) {
       yield entry
+    }
+  }
+}
+
+class Disposable {
+  constructor(disposalAction) {
+    this.disposed = false
+    this.disposalAction = disposalAction
+  }
+
+  dispose() {
+    if (!this.disposed) {
+      this.disposed = true
+      if (typeof this.disposalAction === 'function') {
+        this.disposalAction()
+      }
+      this.disposalAction = null
     }
   }
 }
