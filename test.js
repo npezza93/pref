@@ -7,7 +7,6 @@ const tempy = require('tempy')
 const del = require('del')
 const pkgUp = require('pkg-up')
 const clearModule = require('clear-module')
-const writeFileAtomic = require('write-file-atomic')
 
 const Pref = require('.')
 
@@ -283,19 +282,24 @@ it('onDidChange()', done => {
 })
 
 it('watch()', done => {
-  const {pref} = this
+  const cwd = tempy.directory()
+  const pref1 = new Pref({cwd})
 
-  const checkFoo = (newValue, oldValue) => {
+  pref1.set('foo', '👾')
+
+  pref1.onDidChange('foo', (newValue, oldValue) => {
     assert.equal(newValue, '🐴')
-    assert.equal(oldValue, this.fixture)
+    assert.equal(oldValue, '👾')
+    pref2.set('foo', '👾')
     done()
-  }
+  })
 
-  pref.set('foo', this.fixture)
-  const disposable = pref.onDidChange('foo', checkFoo)
-  fs.writeFileSync(pref.path, JSON.stringify({foo: '🐴'}, null, '\t'))
-  disposable.dispose()
-  pref.set('foo', this.fixture)
+  const pref2 = new Pref({cwd})
+  assert.equal(pref2.get('foo'), '👾')
+  assert.equal(pref1.path, pref2.path)
+  pref2.set('foo', '🐴')
+})
+
 describe('migrations', () => {
   it('does not set version without migrations', () => {
     assert.isUndefined(this.pref.get('version'))

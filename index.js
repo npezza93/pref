@@ -4,6 +4,7 @@ const path = require('path')
 const EventEmitter = require('events')
 const electron = require('electron')
 const {isDeepStrictEqual} = require('util')
+const crypto = require('crypto')
 const dotProp = require('dot-prop')
 const makeDir = require('make-dir')
 const pkgUp = require('pkg-up')
@@ -45,10 +46,10 @@ class Pref {
 
     if (!isDeepStrictEqual(fileStore, store)) {
       this.store = store
-      this.cachedStore = store
     }
-    this.watch()
+
     this.migrate(options, pkg)
+    this.watch(options)
   }
 
   get(key, defaultValue) {
@@ -74,7 +75,6 @@ class Pref {
       dotProp.set(store, key, value)
     }
 
-    this.cachedStore = store
     this.store = store
   }
 
@@ -85,12 +85,10 @@ class Pref {
   delete(key) {
     const {store} = this
     dotProp.delete(store, key)
-    this.cachedStore = store
     this.store = store
   }
 
   clear() {
-    this.cachedStore = {}
     this.store = {}
   }
 
@@ -146,7 +144,11 @@ class Pref {
   set store(value) {
     this.createDir()
 
-    writeFileAtomic.sync(this.path, JSON.stringify(value, null, '\t'))
+    const data = JSON.stringify(value, null, '\t')
+
+    this.currentHash = crypto.createHash('md5').update(data).digest('hex')
+
+    writeFileAtomic.sync(this.path, data)
     this.events.emit('change')
   }
 
@@ -155,20 +157,25 @@ class Pref {
     makeDir.sync(path.dirname(this.path))
   }
 
-  watch() {
-    this.createDir()
 
-    let wait = false
-    fs.watch(path.dirname(this.path), {encoding: 'utf8'}, () => {
-      if (!wait) {
-        wait = setTimeout(() => {
-          wait = false
-        }, 100)
-        if (!isDeepStrictEqual(this.cachedStore, this.store)) {
-          this.events.emit('change')
+  watch(options) {
+    if (options.watch || options.watch === undefined) {
+      this.createDir()
+
+      let wait = false
+      fs.watch(path.dirname(this.path), {encoding: 'utf8'}, () => {
+        if (!wait) {
+          wait = setTimeout(() => {
+            wait = false
+          }, 100)
+
+          const newHash = crypto.createHash('md5').update(this.readPreferences())
+          if (!isDeepStrictEqual(this.currentHash, newHash.digest('hex'))) {
+            this.events.emit('change')
+          }
         }
-      }
-    })
+      })
+    }
   }
 
   disposable(onChange) {
