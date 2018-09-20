@@ -1,7 +1,6 @@
 'use strict'
 const fs = require('fs')
 const path = require('path')
-const EventEmitter = require('events')
 const electron = require('electron')
 const {isDeepStrictEqual} = require('util')
 const crypto = require('crypto')
@@ -13,6 +12,7 @@ const writeFileAtomic = require('write-file-atomic')
 
 const plainObject = () => Object.create(null)
 const compareVersions = require('compare-versions')
+const {Emitter} = require('event-kit')
 
 // Prevent caching of this module so module.parent is always accurate
 delete require.cache[__filename]
@@ -38,7 +38,7 @@ class Pref {
       options.cwd = envPaths(options.projectName).config
     }
 
-    this.events = new EventEmitter()
+    this.events = new Emitter()
     this.path = path.resolve(options.cwd, `${options.configName}.${options.fileExtension}`)
 
     const fileStore = this.store
@@ -113,9 +113,7 @@ class Pref {
       }
     }
 
-    this.events.on('change', onChange)
-
-    return this.disposable(onChange)
+    return this.events.on('change', onChange)
   }
 
   get size() {
@@ -178,10 +176,7 @@ class Pref {
     }
   }
 
-  disposable(onChange) {
-    const action = () => this.events.removeListener('change', onChange)
 
-    return new Disposable(action)
   }
 
   openInEditor() {
