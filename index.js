@@ -11,6 +11,7 @@ const envPaths = require('env-paths')
 const writeFileAtomic = require('write-file-atomic')
 
 const plainObject = () => Object.create(null)
+const compareVersions = require('compare-versions')
 
 // Prevent caching of this module so module.parent is always accurate
 delete require.cache[__filename]
@@ -47,6 +48,7 @@ class Pref {
       this.cachedStore = store
     }
     this.watch()
+    this.migrate(options, pkg)
   }
 
   get(key, defaultValue) {
@@ -179,7 +181,24 @@ class Pref {
     electron.shell.openItem(this.path)
   }
 
+  migrate(options, pkg) {
+    if (options.migrations) {
+      const runningVersion = this.get('version')
 
+      if (runningVersion && compareVersions(runningVersion, pkg.version) === -1) {
+        const migrationsToRun = Object.keys(options.migrations).filter(version => {
+          return compareVersions(version, pkg.version) === -1 &&
+            compareVersions(version, runningVersion) === 1
+        }).sort(compareVersions)
+
+        for (const version of migrationsToRun) {
+          options.migrations[version](this)
+        }
+      }
+
+      if (runningVersion !== pkg.version) {
+        this.set('version', pkg.version)
+      }
     }
   }
 

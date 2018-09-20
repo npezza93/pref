@@ -296,4 +296,18 @@ it('watch()', done => {
   fs.writeFileSync(pref.path, JSON.stringify({foo: '🐴'}, null, '\t'))
   disposable.dispose()
   pref.set('foo', this.fixture)
+describe('migrations', () => {
+  it('does not set version without migrations', () => {
+    assert.isUndefined(this.pref.get('version'))
+  })
+
+  it('sets the version initially', () => {
+    const pref = new Pref({migrations: true})
+    assert.equal(pref.get('version'), require('./package.json').version)
+  })
+
+  it('migrations to the next version', () => {
+    const pref = new Pref({migrations: true})
+    assert.equal(pref.get('version'), require('./package.json').version)
+  })
 })
