@@ -120,17 +120,12 @@ class Pref {
 
   get store() {
     try {
-      const data = fs.readFileSync(this.path, 'utf8')
+      const data = this.readPreferences()
 
       return {...JSON.parse(data)}
     } catch (error) {
-      if (error.code === 'ENOENT') {
-        this.createDir()
-        return plainObject()
-      }
-
       if (error.name === 'SyntaxError') {
-        return plainObject()
+        return {}
       }
 
       throw error
@@ -153,6 +148,18 @@ class Pref {
     makeDir.sync(path.dirname(this.path))
   }
 
+  readPreferences() {
+    try {
+      return fs.readFileSync(this.path, 'utf8')
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        this.createDir()
+        return JSON.stringify({}, null, '\t')
+      }
+
+      throw error
+    }
+  }
 
   watch(options) {
     if (options.watch || options.watch === undefined) {
