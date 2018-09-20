@@ -23,6 +23,8 @@
   "homepage": "https://github.com/npezza93/pref#readme",
   "devDependencies": {
     "chai": "^4.1.2",
+    "clear-module": "^3.0.0",
+    "del": "^3.0.0",
     "electron": "^3.0.0",
     "mocha": "^5.2.0",
     "tempy": "^0.2.1",
