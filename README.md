@@ -147,6 +147,19 @@ pref.store = {
 Get the path to the config file.
 
 
+#### watch
+
+type: `boolean`<br>
+Default: `true`
+
+Sets a file watcher.
+
+This is useful if you have more than one window reading the preferences. If one
+window changes a preference, this allows it to get propagated to all instances
+of Pref. If only ever have one instance on Pref in your app you can turn this
+off.
+
+
 ## License
 
 MIT © [Nick Pezza](https://pezza.co)

@@ -13,7 +13,7 @@ const Pref = require('.')
 global.require = require
 
 beforeEach(() => {
-  this.pref = new Pref({cwd: tempy.directory()})
+  this.pref = new Pref({cwd: tempy.directory(), watch: false})
   this.fixture = '👾'
 })
 
@@ -71,7 +71,7 @@ it('.has()', () => {
   this.pref.set('baz.boo', this.fixture)
   assert(this.pref.has('foo'))
   assert(this.pref.has('baz.boo'))
-  assert.isNotOk(this.pref.has('missing'))
+  assert.isFalse(this.pref.has('missing'))
 })
 
 it('.delete()', () => {
@@ -149,7 +149,7 @@ it('is iterable', () => {
 
 it('doesn\'t write to disk upon instanciation if and only if the store didn\'t change', () => {
   let exists = fs.existsSync(this.pref.path)
-  assert.isNotOk(exists)
+  assert.isFalse(exists)
 
   const pref = new Pref({cwd: tempy.directory(), defaults: {foo: 'bar'}})
   exists = fs.existsSync(pref.path)

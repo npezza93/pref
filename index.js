@@ -15,16 +15,15 @@ const {Emitter} = require('event-kit')
 // Prevent caching of this module so module.parent is always accurate
 delete require.cache[__filename]
 const parentDir = path.dirname((module.parent && module.parent.filename) || '.')
+const app = electron && (electron.app || (electron.remote && electron.remote.app))
 
 module.exports =
 class Pref {
   constructor(options) {
     const pkgPath = pkgUp.sync(parentDir)
+    const pkg = pkgPath && global['require'](pkgPath) // eslint-disable-line dot-notation
 
-    options = {
-      projectName: pkgPath && global['require'](pkgPath).name, // eslint-disable-line dot-notation
-      ...options
-    }
+    options = {projectName: pkg && pkg.name, ...options}
 
     if (!options.projectName && !options.cwd) {
       throw new Error('Project name could not be inferred. Please specify the `projectName` option.')
