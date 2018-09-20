@@ -3,7 +3,7 @@ const fs = require('fs')
 const path = require('path')
 const EventEmitter = require('events')
 const electron = require('electron')
-const isDeepStrictEqual = require('util')
+const {isDeepStrictEqual} = require('util')
 const dotProp = require('dot-prop')
 const makeDir = require('make-dir')
 const pkgUp = require('pkg-up')
@@ -40,7 +40,7 @@ class Pref {
     this.path = path.resolve(options.cwd, `${options.configName}.${options.fileExtension}`)
 
     const fileStore = this.store
-    const store = {...options.defaults, ...fileStore}
+    const store = Object.assign(plainObject(), options.defaults, fileStore)
 
     if (!isDeepStrictEqual(fileStore, store)) {
       this.store = store
@@ -126,7 +126,7 @@ class Pref {
     try {
       const data = fs.readFileSync(this.path, 'utf8')
 
-      return {...JSON.parse(data)}
+      return Object.assign(plainObject(), JSON.parse(data))
     } catch (error) {
       if (error.code === 'ENOENT') {
         this.createDir()
