@@ -179,28 +179,15 @@ class Pref {
     electron.shell.openItem(this.path)
   }
 
+
+    }
+  }
+
   * [Symbol.iterator]() {
     const {store} = this
 
     for (const entry of Object.entries(store)) {
       yield entry
-    }
-  }
-}
-
-class Disposable {
-  constructor(disposalAction) {
-    this.disposed = false
-    this.disposalAction = disposalAction
-  }
-
-  dispose() {
-    if (!this.disposed) {
-      this.disposed = true
-      if (typeof this.disposalAction === 'function') {
-        this.disposalAction()
-      }
-      this.disposalAction = null
     }
   }
 }
