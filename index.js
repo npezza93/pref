@@ -9,7 +9,7 @@ const makeDir = require('make-dir')
 const pkgUp = require('pkg-up')
 const envPaths = require('env-paths')
 const writeFileAtomic = require('write-file-atomic')
-const compareVersions = require('compare-versions')
+const semver = require('semver')
 const {Emitter} = require('event-kit')
 
 // Prevent caching of this module so module.parent is always accurate
@@ -202,13 +202,12 @@ class Pref {
 
   migrate(options, pkg) {
     if (options.migrations) {
-      const runningVersion = this.get('version')
+      const runningVersion = this.get('version') || '0.0.0'
 
-      if (runningVersion && compareVersions(runningVersion, pkg.version) === -1) {
+      if (semver.lt(runningVersion, pkg.version)) {
         const migrationsToRun = Object.keys(options.migrations).filter(version => {
-          return compareVersions(version, pkg.version) === -1 &&
-            compareVersions(version, runningVersion) === 1
-        }).sort(compareVersions)
+          return semver.lt(version, pkg.version) && semver.gt(version, runningVersion)
+        }).sort(semver)
 
         for (const version of migrationsToRun) {
           options.migrations[version](this)

@@ -314,26 +314,34 @@ describe('migrations', () => {
     const cwd = tempy.directory()
 
     const pref1 = new Pref({cwd})
-    pref1.set('version', '0.0.2')
+    pref1.set('version', '1.0.0')
     pref1.set('old', 'old')
 
     const pref2 = new Pref({
       cwd,
       migrations: {
-        '1.0.0': store => {
+        '0.0.3': store => {
+          store.set('03', 1)
+        },
+        '1.0.1': store => {
           const old = store.get('old')
           store.set('new', old)
           store.delete('old')
         },
+        '2.0.0': store => {
+          store.set('2', 1)
+        },
         '4.0.0': store => {
-          store.set('iShouldntExist', 1)
+          store.set('4', 1)
         }
       }
     })
 
     assert.isUndefined(pref2.get('old'))
-    assert.isUndefined(pref2.get('iShouldntExist'))
+    assert.isUndefined(pref2.get('03'))
+    assert.isUndefined(pref2.get('4'))
     assert.equal(pref2.get('new'), 'old')
+    assert.equal(pref2.get('2'), 1)
     assert.equal(pref2.get('version'), require('./package.json').version)
   })
 })
