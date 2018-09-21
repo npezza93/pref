@@ -144,10 +144,12 @@ it('`fileExtension` option', () => {
 
 it('is iterable', () => {
   this.pref.set({foo: this.fixture, bar: this.fixture})
-  assert.deepEqual([...this.pref], [['foo', this.fixture], ['bar', this.fixture]])
+  assert.deepEqual(
+    [...this.pref], [['foo', this.fixture], ['bar', this.fixture]]
+  )
 })
 
-it('doesn\'t write to disk upon instanciation if and only if the store didn\'t change', () => {
+it('does not write to disk upon instantiation if store did not change', () => {
   let exists = fs.existsSync(this.pref.path)
   assert.isFalse(exists)
 
