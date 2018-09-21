@@ -34,10 +34,7 @@ class Pref {
     this.schema = options.schema
 
     this.ajv = new Ajv({coerceTypes: true})
-    this.ajv.addKeyword('color', {
-      type: 'string',
-      compile: _ => colorCoercer
-    })
+    this.ajv.addKeyword('color', {compile: _ => colorCoercer})
 
     const fileStore = this.store
     const store = {...options.defaults, ...fileStore}
