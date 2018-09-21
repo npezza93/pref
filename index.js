@@ -6,35 +6,16 @@ const {isDeepStrictEqual} = require('util')
 const crypto = require('crypto')
 const dotProp = require('dot-prop')
 const makeDir = require('make-dir')
-const pkgUp = require('pkg-up')
-const envPaths = require('env-paths')
 const writeFileAtomic = require('write-file-atomic')
 const semver = require('semver')
 const {Emitter} = require('event-kit')
 
-// Prevent caching of this module so module.parent is always accurate
-delete require.cache[__filename]
-const parentDir = path.dirname((module.parent && module.parent.filename) || '.')
-const app = electron && (electron.app || (electron.remote && electron.remote.app))
+const {pkg, initOptions} = require('./utils')
 
 module.exports =
 class Pref {
   constructor(options) {
-    const pkgPath = pkgUp.sync(parentDir)
-    const pkg = pkgPath && global['require'](pkgPath) // eslint-disable-line dot-notation
-
-    options = {projectName: pkg && pkg.name, ...options}
-
-    if (!options.projectName && !options.cwd) {
-      throw new Error('Project name could not be inferred. Please specify the `projectName` option.')
-    }
-
-    options = {
-      configName: 'config',
-      fileExtension: 'json',
-      cwd: this.findCwd(options),
-      ...options
-    }
+    options = initOptions(options)
 
     this.events = new Emitter()
     this.path = path.resolve(options.cwd, `${options.configName}.${options.fileExtension}`)
@@ -46,7 +27,7 @@ class Pref {
       this.store = store
     }
 
-    this.migrate(options, pkg)
+    this.migrate(options)
     this.watch(options)
   }
 
@@ -143,6 +124,10 @@ class Pref {
     this.events.emit('change')
   }
 
+  openInEditor() {
+    electron.shell.openItem(this.path)
+  }
+
   createDir() {
     // Ensure the directory exists as it could have been deleted in the meantime
     makeDir.sync(path.dirname(this.path))
@@ -181,26 +166,7 @@ class Pref {
     }
   }
 
-  findCwd(options) {
-    const defaultElectronCwd = app && app.getPath('userData')
-    let cwd
-
-    if (options.cwd && !path.isAbsolute(options.cwd) && defaultElectronCwd) {
-      cwd = path.join(defaultElectronCwd, options.cwd)
-    } else if (!options.cwd && defaultElectronCwd) {
-      cwd = defaultElectronCwd
-    } else if (!options.cwd) {
-      cwd = envPaths(options.projectName).config
-    }
-
-    return cwd
-  }
-
-  openInEditor() {
-    electron.shell.openItem(this.path)
-  }
-
-  migrate(options, pkg) {
+  migrate(options) {
     if (options.migrations) {
       const runningVersion = this.get('version') || '0.0.0'
 
