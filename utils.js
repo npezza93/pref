@@ -4,6 +4,7 @@ const path = require('path')
 const electron = require('electron')
 const pkgUp = require('pkg-up')
 const envPaths = require('env-paths')
+const color = require('color')
 
 // Prevent caching of this module so module.parent is always accurate
 delete require.cache[__filename]
@@ -27,22 +28,30 @@ const findCwd = options => {
   return cwd || envPaths(options.projectName).config
 }
 
-const initOptions =
-  options => {
-    options = {projectName: pkg.name, ...options}
+const initOptions = options => {
+  options = {projectName: pkg.name, ...options}
 
-    if (!options.projectName && !options.cwd) {
-      throw new Error('Project name could not be inferred. Please specify the `projectName` option.')
-    }
-
-    options = {
-      configName: 'config',
-      fileExtension: 'json',
-      cwd: findCwd(options),
-      ...options
-    }
-
-    return options
+  if (!options.projectName && !options.cwd) {
+    throw new Error('Project name could not be inferred. Please specify the `projectName` option.')
   }
 
-module.exports = {pkg, initOptions}
+  options = {
+    configName: 'config',
+    fileExtension: 'json',
+    cwd: findCwd(options),
+    ...options
+  }
+
+  return options
+}
+
+const colorCoercer = (data, dataPath, parentData, parentDataProperty) => {
+  try {
+    parentData[parentDataProperty] = color(data).toString()
+    return true
+  } catch (_) {
+    return false
+  }
+}
+
+module.exports = {pkg, initOptions, colorCoercer}

@@ -10,19 +10,8 @@ const writeFileAtomic = require('write-file-atomic')
 const semver = require('semver')
 const {Emitter} = require('event-kit')
 const Ajv = require('ajv')
-const Color = require('color')
 
-const {pkg, initOptions} = require('./utils')
-
-const colorCoercer = (data, dataPath, parentData, parentDataProperty) => {
-  try {
-    const color = new Color(data)
-    parentData[parentDataProperty] = color.toString()
-    return true
-  } catch (_) {
-    return false
-  }
-}
+const {pkg, initOptions, colorCoercer} = require('./utils')
 
 module.exports =
 class Pref {
