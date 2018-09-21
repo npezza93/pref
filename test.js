@@ -393,4 +393,35 @@ describe('schema', () => {
     assert.deepEqual(pref.get('foo'), {})
     assert.isFalse(pref.isValid())
   })
+
+  it('fails validation when color fails', () => {
+    const schema = {
+      type: 'object',
+      properties: {foo: {type: 'string', color: true}}
+    }
+    const pref = new Pref({
+      schema,
+      cwd: tempy.directory(),
+      watch: false,
+      defaults: {foo: '24'}
+    })
+
+    assert.isFalse(pref.isValid())
+  })
+
+  it('coerces string to color', () => {
+    const schema = {
+      type: 'object',
+      properties: {foo: {type: 'string', color: true}}
+    }
+    const pref = new Pref({
+      schema,
+      cwd: tempy.directory(),
+      watch: false,
+      defaults: {foo: '#fff'}
+    })
+
+    assert.equal(pref.get('foo'), 'rgb(255, 255, 255)')
+    assert(pref.isValid())
+  })
 })
