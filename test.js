@@ -144,10 +144,12 @@ it('`fileExtension` option', () => {
 
 it('is iterable', () => {
   this.pref.set({foo: this.fixture, bar: this.fixture})
-  assert.deepEqual([...this.pref], [['foo', this.fixture], ['bar', this.fixture]])
+  assert.deepEqual(
+    [...this.pref], [['foo', this.fixture], ['bar', this.fixture]]
+  )
 })
 
-it('doesn\'t write to disk upon instanciation if and only if the store didn\'t change', () => {
+it('does not write to disk upon instantiation if store did not change', () => {
   let exists = fs.existsSync(this.pref.path)
   assert.isFalse(exists)
 
@@ -343,5 +345,85 @@ describe('migrations', () => {
     assert.equal(pref2.get('new'), 'old')
     assert.equal(pref2.get('2'), 1)
     assert.equal(pref2.get('version'), require('./package.json').version)
+  })
+})
+
+describe('schema', () => {
+  it('is not valid', () => {
+    const schema = {
+      type: 'object',
+      properties: {foo: {type: 'number'}, bar: {type: 'boolean'}}
+    }
+    const pref = new Pref({
+      schema,
+      cwd: tempy.directory(),
+      watch: false,
+      defaults: {foo: {}, bar: []}
+    })
+
+    assert.isFalse(pref.isValid())
+  })
+
+  it('coerces the store', () => {
+    const schema = {
+      type: 'object',
+      properties: {foo: {type: 'number'}, bar: {type: 'boolean'}}
+    }
+    const pref = new Pref({
+      schema,
+      cwd: tempy.directory(),
+      watch: false,
+      defaults: {foo: '12', bar: 'false'}
+    })
+
+    assert.equal(pref.get('foo'), 12)
+    assert.equal(pref.get('bar'), false)
+  })
+
+  it('returns uncoerced value when validation fails', () => {
+    const schema = {
+      type: 'object',
+      properties: {foo: {type: 'number'}, bar: {type: 'boolean'}}
+    }
+    const pref = new Pref({
+      schema,
+      cwd: tempy.directory(),
+      watch: false,
+      defaults: {foo: {}, bar: 'false'}
+    })
+
+    assert.deepEqual(pref.get('foo'), {})
+    assert.isFalse(pref.isValid())
+  })
+
+  it('fails validation when color fails', () => {
+    const schema = {
+      type: 'object',
+      properties: {foo: {type: 'string', color: true}}
+    }
+    const pref = new Pref({
+      schema,
+      cwd: tempy.directory(),
+      watch: false,
+      defaults: {foo: '24'}
+    })
+
+    assert.isFalse(pref.isValid())
+  })
+
+  it('coerces string to color', () => {
+    const schema = {
+      type: 'object',
+      properties: {foo: {type: 'string', color: true}}
+    }
+    const pref = new Pref({
+      schema,
+      cwd: tempy.directory(),
+      watch: false,
+      defaults: {foo: '#fff'}
+    })
+
+    assert.equal(pref.get('foo'), 'rgb(255, 255, 255)')
+    assert(pref.isValid())
   })
 })
