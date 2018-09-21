@@ -345,3 +345,52 @@ describe('migrations', () => {
     assert.equal(pref2.get('version'), require('./package.json').version)
   })
 })
+
+describe('schema', () => {
+  it('is not valid', () => {
+    const schema = {
+      type: 'object',
+      properties: {foo: {type: 'number'}, bar: {type: 'boolean'}}
+    }
+    const pref = new Pref({
+      schema,
+      cwd: tempy.directory(),
+      watch: false,
+      defaults: {foo: {}, bar: []}
+    })
+
+    assert.isFalse(pref.isValid())
+  })
+
+  it('coerces the store', () => {
+    const schema = {
+      type: 'object',
+      properties: {foo: {type: 'number'}, bar: {type: 'boolean'}}
+    }
+    const pref = new Pref({
+      schema,
+      cwd: tempy.directory(),
+      watch: false,
+      defaults: {foo: '12', bar: 'false'}
+    })
+
+    assert.equal(pref.get('foo'), 12)
+    assert.equal(pref.get('bar'), false)
+  })
+
+  it('returns uncoerced value when validation fails', () => {
+    const schema = {
+      type: 'object',
+      properties: {foo: {type: 'number'}, bar: {type: 'boolean'}}
+    }
+    const pref = new Pref({
+      schema,
+      cwd: tempy.directory(),
+      watch: false,
+      defaults: {foo: {}, bar: 'false'}
+    })
+
+    assert.deepEqual(pref.get('foo'), {})
+    assert.isFalse(pref.isValid())
+  })
+})

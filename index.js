@@ -9,6 +9,7 @@ const makeDir = require('make-dir')
 const writeFileAtomic = require('write-file-atomic')
 const semver = require('semver')
 const {Emitter} = require('event-kit')
+const Ajv = require('ajv')
 
 const {pkg, initOptions} = require('./utils')
 
@@ -19,6 +20,7 @@ class Pref {
 
     this.events = new Emitter()
     this.path = path.resolve(options.cwd, `${options.configName}.${options.fileExtension}`)
+    this.schema = options.schema
 
     const fileStore = this.store
     const store = {...options.defaults, ...fileStore}
@@ -32,7 +34,16 @@ class Pref {
   }
 
   get(key, defaultValue) {
-    return dotProp.get(this.store, key, defaultValue)
+    const data = {...this.store}
+
+    if (this.schema) {
+      const ajv = new Ajv({coerceTypes: true})
+      const validate = ajv.compile(this.schema)
+
+      validate(data)
+    }
+
+    return dotProp.get(data, key, defaultValue)
   }
 
   set(key, value) {
@@ -184,6 +195,14 @@ class Pref {
         this.set('version', pkg.version)
       }
     }
+  }
+
+  isValid() {
+    const ajv = new Ajv()
+    const data = {...this.store}
+    const validate = ajv.compile(this.schema)
+
+    return validate(data)
   }
 
   * [Symbol.iterator]() {
