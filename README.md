@@ -159,6 +159,34 @@ window changes a preference, this allows it to get propagated to all instances
 of Pref. If only ever have one instance on Pref in your app you can turn this
 off.
 
+#### migrations
+
+type: `object`<br>
+Default: `undefined`
+
+Migrations to be run between versions.
+
+Useful for transitioning preference changes between application versions. Ex:
+```js
+// version is set to 0.0.1, the current app version is 2.0.8, 'old' key is set to 1
+const store = new Store({
+	migrations: {
+		'0.0.0': store => {
+			store.set('bad key', 2);
+		},
+		'1.0.0': store => {
+			const old = store.get('old');
+			store.set('new', old);
+			store.delete('old');
+		},
+		'1.0.2': store => {
+			store.set('a new key', 't');
+		}
+	}
+})
+store.store
+=> { version: '2.0.8', new: 1, 'a new key': 't' }
+```
 
 ## License
 
