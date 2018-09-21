@@ -33,6 +33,7 @@
     "node": ">=10"
   },
   "dependencies": {
+    "ajv": "^6.5.3",
     "dot-prop": "^4.2.0",
     "env-paths": "^1.0.0",
     "event-kit": "^2.5.1",
