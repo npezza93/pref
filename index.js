@@ -20,10 +20,12 @@ class Pref {
 
     this.events = new Emitter()
     this.path = path.resolve(options.cwd, `${options.configName}.${options.fileExtension}`)
-    this.schema = options.schema
 
-    this.ajv = new Ajv({coerceTypes: true})
-    this.ajv.addKeyword('color', {compile: _ => colorCoercer})
+    if (options.schema) {
+      this.ajv = new Ajv({coerceTypes: true, useDefaults: true})
+      this.ajv.addKeyword('color', {compile: _ => colorCoercer})
+      this.schema = options.schema
+    }
 
     const fileStore = this.store
     const store = {...options.defaults, ...fileStore}
@@ -39,7 +41,7 @@ class Pref {
   get(key, defaultValue) {
     const data = {...this.store}
 
-    if (this.schema) {
+    if (this.schema && this.ajv) {
       const validate = this.ajv.compile(this.schema)
 
       validate(data)
