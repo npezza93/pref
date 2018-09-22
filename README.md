@@ -2,7 +2,7 @@
 
 > Simple preference handling for your electron application
 
-This is heavily inspired by [@sindresorhus](https://github.com/sindresorhus)'s [conf](https://github.com/sindresorhus/conf) and [electron-store](https://github.com/sindresorhus/electron-store) projects. Shout out to him for creating these spectacular packages.
+This is heavily inspired by and an extension of [@sindresorhus](https://github.com/sindresorhus)'s [conf](https://github.com/sindresorhus/conf) and [electron-store](https://github.com/sindresorhus/electron-store) projects. Shout out to him for creating these spectacular packages.
 
 ## Install
 
@@ -88,6 +88,59 @@ with a file with a custom file extension that can be associated with your app.
 These might be simple save/export/preference files that are intended to be
 shareable or saved outside of the app.
 
+#### schema
+
+type: `object`<br>
+Default: `undefined`
+
+JSON schema definition of store.
+
+You can pass in a valid JSON schema and use it to coerce and validate your
+store. By default if a schema is passed in, it will coerce and add the defaults
+listed in the schema and coerce the values when you get them.
+
+#### watch
+
+type: `boolean`<br>
+Default: `true`
+
+Sets a file watcher.
+
+This is useful if you have more than one window reading the preferences. If one
+window changes a preference, this allows it to get propagated to all instances
+of Pref. If only ever have one instance on Pref in your app you can turn this
+off.
+
+#### migrations
+
+type: `object`<br>
+Default: `undefined`
+
+Migrations to be run between versions.
+
+Useful for transitioning preference changes between application versions. Ex:
+```js
+// version is set to 0.0.1, the current app version is 2.0.8, 'old' key is set to 1
+const store = new Store({
+  migrations: {
+    '0.0.0': store => {
+      store.set('bad key', 2);
+    },
+    '1.0.0': store => {
+      const old = store.get('old');
+      store.set('new', old);
+      store.delete('old');
+    },
+    '1.0.2': store => {
+      store.set('a new key', 't');
+    }
+  }
+})
+store.store
+=> { version: '2.0.8', new: 1, 'a new key': 't' }
+```
+
+
 ### Instance
 
 You can use [dot-notation](https://github.com/sindresorhus/dot-prop) in a `key` to access nested properties.
@@ -147,46 +200,10 @@ pref.store = {
 Get the path to the config file.
 
 
-#### watch
+#### .isValid => Boolean
 
-type: `boolean`<br>
-Default: `true`
+Validates the store against the passed in JSON schema.
 
-Sets a file watcher.
-
-This is useful if you have more than one window reading the preferences. If one
-window changes a preference, this allows it to get propagated to all instances
-of Pref. If only ever have one instance on Pref in your app you can turn this
-off.
-
-#### migrations
-
-type: `object`<br>
-Default: `undefined`
-
-Migrations to be run between versions.
-
-Useful for transitioning preference changes between application versions. Ex:
-```js
-// version is set to 0.0.1, the current app version is 2.0.8, 'old' key is set to 1
-const store = new Store({
-  migrations: {
-    '0.0.0': store => {
-      store.set('bad key', 2);
-    },
-    '1.0.0': store => {
-      const old = store.get('old');
-      store.set('new', old);
-      store.delete('old');
-    },
-    '1.0.2': store => {
-      store.set('a new key', 't');
-    }
-  }
-})
-store.store
-=> { version: '2.0.8', new: 1, 'a new key': 't' }
-```
 
 ## License
 
