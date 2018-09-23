@@ -183,7 +183,7 @@ class Pref {
 
   migrate(options) {
     if (options.migrations) {
-      const runningVersion = this.get('version') || '0.0.0'
+      const runningVersion = this.store.version || '0.0.0'
 
       if (semver.lt(runningVersion, pkg.version)) {
         const migrationsToRun = Object.keys(options.migrations).filter(version => {
