@@ -200,9 +200,9 @@ pref.store = {
 Get the path to the config file.
 
 
-#### .isValid => Boolean
+#### .isValid()
 
-Validates the store against the passed in JSON schema.
+Validates the store against the passed in JSON schema. Returns a boolean.
 
 
 ## License
