@@ -14,18 +14,24 @@ const pkgPath = pkgUp.sync(parentDir)
 const pkg = (pkgPath && require(pkgPath)) || {} // eslint-disable-line dot-notation
 
 const findCwd = options => {
-  const app = electron && (electron || electron.remote)
-  const defaultElectronCwd = app && app.app && app.app.getPath('userData')
+  const app = (electron && electron.app) ||
+    (electron && electron.remote && electron.remote.app)
+
+  const defaultCwd = app && app.getPath('userData')
 
   let cwd
 
-  if (options.cwd && !path.isAbsolute(options.cwd) && defaultElectronCwd) {
-    cwd = path.join(defaultElectronCwd, options.cwd)
-  } else if (!options.cwd && defaultElectronCwd) {
-    cwd = defaultElectronCwd
+  if (options.cwd && path.isAbsolute(options.cwd)) {
+    cwd = options.cwd
+  } else if (options.cwd && !path.isAbsolute(options.cwd) && defaultCwd) {
+    cwd = path.join(defaultCwd, options.cwd)
+  } else if (defaultCwd) {
+    cwd = defaultCwd
+  } else {
+    cwd = envPaths(options.projectName).config
   }
 
-  return cwd || envPaths(options.projectName).config
+  return cwd
 }
 
 const initOptions = options => {
