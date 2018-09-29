@@ -86,6 +86,13 @@ class Pref {
     this.store = {}
   }
 
+  dispose() {
+    this.events.dispose()
+    if (this.fileWatcher) {
+      this.fileWatcher.close()
+    }
+  }
+
   onDidChange(key, callback) {
     if (typeof key !== 'string') {
       throw new TypeError(`Expected \`key\` to be of type \`string\`, got ${typeof key}`)
@@ -166,7 +173,7 @@ class Pref {
       this.createDir()
 
       let wait = false
-      fs.watch(path.dirname(this.path), {encoding: 'utf8'}, () => {
+      this.fileWatcher = fs.watch(path.dirname(this.path), {encoding: 'utf8'}, () => {
         if (!wait) {
           wait = setTimeout(() => {
             wait = false
