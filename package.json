@@ -1,6 +1,6 @@
 {
   "name": "pref",
-  "version": "3.1.2",
+  "version": "3.1.3",
   "description": "Add preferences to your app or electron app",
   "main": "index.js",
   "scripts": {
