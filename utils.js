@@ -13,9 +13,13 @@ const pkgPath = pkgUp.sync(parentDir)
 
 const pkg = (pkgPath && require(pkgPath)) || {} // eslint-disable-line dot-notation
 
-const findCwd = options => {
-  const app = (electron && electron.app) ||
+const electronApp = () => {
+  return (electron && electron.app) ||
     (electron && electron.remote && electron.remote.app)
+}
+
+const findCwd = options => {
+  const app = electronApp()
 
   const defaultCwd = app && app.getPath('userData')
 
@@ -45,6 +49,7 @@ const initOptions = options => {
     configName: 'config',
     fileExtension: 'json',
     cwd: findCwd(options),
+    packageVersion: (electronApp() && electronApp().getVersion()) || pkg.version
     ...options
   }
 

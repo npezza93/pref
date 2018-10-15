@@ -11,7 +11,7 @@ const semver = require('semver')
 const {Emitter} = require('event-kit')
 const Ajv = require('ajv')
 
-const {pkg, initOptions, colorCoercer} = require('./utils')
+const {initOptions, colorCoercer} = require('./utils')
 
 module.exports =
 class Pref {
@@ -192,9 +192,9 @@ class Pref {
     if (options.migrations) {
       const runningVersion = this.store.version || '0.0.0'
 
-      if (semver.lt(runningVersion, pkg.version)) {
+      if (semver.lt(runningVersion, options.packageVersion)) {
         const migrationsToRun = Object.keys(options.migrations).filter(version => {
-          return semver.lt(version, pkg.version) && semver.gt(version, runningVersion)
+          return semver.lt(version, options.packageVersion) && semver.gt(version, runningVersion)
         }).sort(semver)
 
         for (const version of migrationsToRun) {
@@ -202,8 +202,8 @@ class Pref {
         }
       }
 
-      if (runningVersion !== pkg.version) {
-        this.set('version', pkg.version)
+      if (runningVersion !== options.packageVersion) {
+        this.set('version', options.packageVersion)
       }
     }
   }
