@@ -64,6 +64,14 @@ Default: The `name` field in the package.json closest to where `pref` is importe
 You only need to specify this if you don't have a package.json file in your
 project.
 
+#### projectVersion
+
+Type: `string`<br>
+Default: The `version` field in the package.json closest to where `pref` is imported.
+
+You only need to specify this if you don't have a package.json file in your
+project and if you are using migrations.
+
 #### cwd
 
 Type: `string`<br>
