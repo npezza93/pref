@@ -49,7 +49,7 @@ const initOptions = options => {
     configName: 'config',
     fileExtension: 'json',
     cwd: findCwd(options),
-    packageVersion: (electronApp() && electronApp().getVersion()) || pkg.version
+    packageVersion: (electronApp() && electronApp().getVersion()) || pkg.version,
     ...options
   }
 
