@@ -194,7 +194,7 @@ class Pref {
 
       if (semver.lt(runningVersion, options.packageVersion)) {
         const migrationsToRun = Object.keys(options.migrations).filter(version => {
-          return semver.lt(version, options.packageVersion) && semver.gt(version, runningVersion)
+          return semver.lte(version, options.packageVersion) && semver.gt(version, runningVersion)
         }).sort(semver)
 
         for (const version of migrationsToRun) {

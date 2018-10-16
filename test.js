@@ -312,6 +312,23 @@ describe('migrations', () => {
     assert.equal(pref.get('version'), require('./package.json').version)
   })
 
+  it('sets the version initially', () => {
+    const pref = new Pref({
+      migrations: {
+        '15.0.0': store => {
+          store.set('doAThing', 1)
+        },
+        '15.0.1': store => {
+          store.set('dontDoAThing', 1)
+        }
+      },
+      packageVersion: '15.0.0'
+    })
+    assert.equal(pref.get('version'), '15.0.0')
+    assert.equal(pref.get('doAThing'), 1)
+    assert.isUndefined(pref.get('dontDoAThing'))
+  })
+
   it('migrates to the next version', () => {
     const cwd = tempy.directory()
 
