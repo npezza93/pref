@@ -2,6 +2,7 @@
 
 const path = require('path')
 const electron = require('electron')
+const remote = require('@electron/remote')
 const pkgUp = require('pkg-up')
 const envPaths = require('env-paths')
 const color = require('color')
@@ -14,8 +15,7 @@ const pkgPath = pkgUp.sync(parentDir)
 const pkg = (pkgPath && require(pkgPath)) || {} // eslint-disable-line dot-notation
 
 const electronApp = () => {
-  return (electron && electron.app) ||
-    (electron && electron.remote && electron.remote.app)
+  return (electron && electron.app) || (remote && remote.app)
 }
 
 const findCwd = options => {
